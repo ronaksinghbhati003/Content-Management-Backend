@@ -18,6 +18,11 @@ export interface UserInterFace {
     _id: string;
     createdAt: Date;
     updatedAt: Date;
+    youtubeConnected?: boolean;
+    youtubeChannelName?: string;
+    youtubeChannelHandle?: string;
+    youtubeChannelIcon?: string;
+    youtubeSubscriberCount?: number;
 }
 
 interface LoginData {
@@ -48,7 +53,12 @@ export class UserService {
                 email: user.email,
                 _id: user._id.toString(),
                 createdAt: user.createdAt,
-                updatedAt: user.updatedAt
+                updatedAt: user.updatedAt,
+                youtubeConnected: user.youtubeConnected,
+                youtubeChannelName: user.youtubeChannelName ?? undefined,
+                youtubeChannelHandle: user.youtubeChannelHandle ?? undefined,
+                youtubeChannelIcon: user.youtubeChannelIcon ?? undefined,
+                youtubeSubscriberCount: user.youtubeSubscriberCount ?? undefined
             },
             token
         }
@@ -62,7 +72,32 @@ export class UserService {
             email: user.email,
             _id: user._id.toString(),
             createdAt: user.createdAt,
-            updatedAt: user.updatedAt
+            updatedAt: user.updatedAt,
+            youtubeConnected: user.youtubeConnected,
+            youtubeChannelName: user.youtubeChannelName ?? undefined,
+            youtubeChannelHandle: user.youtubeChannelHandle ?? undefined,
+            youtubeChannelIcon: user.youtubeChannelIcon ?? undefined,
+            youtubeSubscriberCount: user.youtubeSubscriberCount ?? undefined
         }
+    }
+
+    async getProfile(userId: string): Promise<UserInterFace> {
+        const user = await User.findById(userId);
+        if (!user) {
+            throw new UnauthorizedException("User not found");
+        }
+        return {
+            firstName: user.firstName,
+            lastName: user.lastName,
+            email: user.email,
+            _id: user._id.toString(),
+            createdAt: user.createdAt,
+            updatedAt: user.updatedAt,
+            youtubeConnected: user.youtubeConnected,
+            youtubeChannelName: user.youtubeChannelName ?? undefined,
+            youtubeChannelHandle: user.youtubeChannelHandle ?? undefined,
+            youtubeChannelIcon: user.youtubeChannelIcon ?? undefined,
+            youtubeSubscriberCount: user.youtubeSubscriberCount ?? undefined
+        };
     }
 } 

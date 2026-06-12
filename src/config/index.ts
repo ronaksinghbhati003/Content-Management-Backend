@@ -15,6 +15,9 @@ interface Config {
   jwtExpiresIn: string;
   hashSaltRound: number;
   geminiApiKey: string;
+  youtubeClientId: string;
+  youtubeClientSecret: string;
+  youtubeRedirectUri: string;
 }
 
 const config: Config = {
@@ -27,7 +30,10 @@ const config: Config = {
   jwtSecret: process.env.JWT_SECRET || '',
   jwtExpiresIn: process.env.JWT_EXPIRES_IN || '1h',
   hashSaltRound: Number(process.env.HASH_SALT_ROUND) || 10,
-  geminiApiKey: process.env.GEMINI_API_KEY || ''
+  geminiApiKey: process.env.GEMINI_API_KEY || '',
+  youtubeClientId: process.env.YOUTUBE_CLIENT_ID || '',
+  youtubeClientSecret: process.env.YOUTUBE_CLIENT_SECRET || '',
+  youtubeRedirectUri: process.env.YOUTUBE_REDIRECT_URI || 'http://localhost:3040/api/v1/publish/youtube/callback'
 };
 
 export default config;

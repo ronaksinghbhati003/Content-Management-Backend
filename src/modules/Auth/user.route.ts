@@ -167,8 +167,24 @@ userRouter.post("/login", bearerTokenMiddleware, validate(loginSchema), asyncHan
  *             schema:
  *               $ref: '#/components/schemas/ErrorResponse'
  */
+import { accessTokenMiddleware } from "../../middlewares/access-token.middleware";
+
 userRouter.post("/register", bearerTokenMiddleware, validate(registerSchema), asyncHandler(userController.register))
 
-
+/**
+ * @swagger
+ * /user/profile:
+ *   get:
+ *     summary: Get user profile
+ *     description: Returns the profile details for the authenticated user.
+ *     tags:
+ *       - Auth
+ *     security:
+ *       - accessAuth: []
+ *     responses:
+ *       200:
+ *         description: Profile fetched successfully
+ */
+userRouter.get("/profile", accessTokenMiddleware, asyncHandler(userController.getProfile))
 
 export default userRouter;

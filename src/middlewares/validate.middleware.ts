@@ -26,7 +26,12 @@ export const validate = (
       return;
     }
     // Replace with parsed (and potentially transformed) data
-    req[target] = result.data;
+    Object.defineProperty(req, target, {
+      value: result.data,
+      writable: true,
+      configurable: true,
+      enumerable: true,
+    });
     next();
   };
 };

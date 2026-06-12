@@ -10,6 +10,11 @@ export interface AuthRequest extends Request {
 }
 
 export const accessTokenMiddleware = (req: AuthRequest, res: Response, next: NextFunction) => {
+    // Bypass auth check for YouTube OAuth redirect callback
+    if (req.path.includes('/publish/youtube/callback')) {
+        return next();
+    }
+
     const authHeader = req.headers['authorization'];
     logger.info(`Checking Access Token: ${authHeader}`);
 

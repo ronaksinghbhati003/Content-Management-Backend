@@ -44,4 +44,10 @@ export class UserController {
         res.status(201).json(ApiResponse.created(data, "User Registered Successfully"))
 
     }
+
+    getProfile = async (req: any, res: Response): Promise<void> => {
+        const userId = req.users?._id;
+        const profile = await this.userService.getProfile(userId);
+        res.status(200).json(ApiResponse.ok(profile, "Profile fetched successfully"));
+    }
 }

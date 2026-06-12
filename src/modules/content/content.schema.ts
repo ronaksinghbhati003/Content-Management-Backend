@@ -14,6 +14,9 @@ export interface IContent extends Document {
     publishedDate?: Date;
     userId: mongoose.Types.ObjectId;
     seriesId: mongoose.Types.ObjectId;
+    number?: number;
+    duration?: string;
+    dueDate?: Date;
     isDeleted: boolean;
     deletedAt?: Date;
     createdAt: Date;
@@ -84,6 +87,15 @@ const contentSchema = new Schema<IContent>(
             default: null,
             index: true
         },
+        number: {
+            type: Number,
+        },
+        duration: {
+            type: String,
+        },
+        dueDate: {
+            type: Date,
+        },
         isDeleted: {
             type: Boolean,
             default: false,
@@ -94,8 +106,77 @@ const contentSchema = new Schema<IContent>(
             default: null
         }
     },
-    { timestamps: true }
+    { 
+        timestamps: true,
+        toJSON: { 
+            virtuals: true,
+            transform: (doc, ret: any) => {
+                ret.id = ret._id ? ret._id.toString() : ret.id;
+                ret.type = ret.contentType;
+                if (ret.seriesId) {
+                    const statusMap: Record<string, string> = {
+                        'IDEA': 'Draft',
+                        'PLANNED': 'Scripted',
+                        'IN_PROGRESS': 'Filmed',
+                        'REVIEW': 'Edited',
+                        'SCHEDULED': 'Edited',
+                        'PUBLISHED': 'Published',
+                        'ARCHIVED': 'Draft'
+                    };
+                    ret.status = statusMap[ret.status] || 'Draft';
+                } else {
+                    const statusMap: Record<string, string> = {
+                        'IDEA': 'draft',
+                        'PLANNED': 'draft',
+                        'IN_PROGRESS': 'draft',
+                        'REVIEW': 'draft',
+                        'SCHEDULED': 'scheduled',
+                        'PUBLISHED': 'published',
+                        'ARCHIVED': 'draft'
+                    };
+                    ret.status = statusMap[ret.status] || 'draft';
+                }
+                return ret;
+            }
+        },
+        toObject: { 
+            virtuals: true,
+            transform: (doc, ret: any) => {
+                ret.id = ret._id ? ret._id.toString() : ret.id;
+                ret.type = ret.contentType;
+                if (ret.seriesId) {
+                    const statusMap: Record<string, string> = {
+                        'IDEA': 'Draft',
+                        'PLANNED': 'Scripted',
+                        'IN_PROGRESS': 'Filmed',
+                        'REVIEW': 'Edited',
+                        'SCHEDULED': 'Edited',
+                        'PUBLISHED': 'Published',
+                        'ARCHIVED': 'Draft'
+                    };
+                    ret.status = statusMap[ret.status] || 'Draft';
+                } else {
+                    const statusMap: Record<string, string> = {
+                        'IDEA': 'draft',
+                        'PLANNED': 'draft',
+                        'IN_PROGRESS': 'draft',
+                        'REVIEW': 'draft',
+                        'SCHEDULED': 'scheduled',
+                        'PUBLISHED': 'published',
+                        'ARCHIVED': 'draft'
+                    };
+                    ret.status = statusMap[ret.status] || 'draft';
+                }
+                return ret;
+            }
+        }
+    }
 );
+
+// Virtual for 'type' fallback
+contentSchema.virtual('type').get(function(this: any) {
+    return this.contentType;
+});
 
 // Add index for common queries
 contentSchema.index({ userId: 1, status: 1, isDeleted: 1 });

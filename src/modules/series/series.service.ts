@@ -41,7 +41,7 @@ export class SeriesService {
         query: { page?: number; limit?: number; status?: string; platform?: string }
     ) {
         const page = Number(query.page) || 1;
-        const limit = Number(query.limit) || 10;
+        const limit = Number(query.limit) || 1000;
         const skip = (page - 1) * limit;
 
         const filter: Record<string, unknown> = {
@@ -124,7 +124,7 @@ export class SeriesService {
         }
 
         const page = Number(query.page) || 1;
-        const limit = Number(query.limit) || 10;
+        const limit = Number(query.limit) || 1000;
         const skip = (page - 1) * limit;
 
         const filter = {

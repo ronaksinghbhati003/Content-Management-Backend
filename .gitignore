@@ -22,3 +22,7 @@ Thumbs.db
 
 #Postman
 postman_collection.json
+
+# Local Uploads
+uploads/
+

@@ -30,6 +30,40 @@ const userSchema = new mongoose.Schema({
     deletedAt: {
         type: Date,
         default: null
+    },
+    
+    // YouTube OAuth & Account Connection Status
+    youtubeConnected: {
+        type: Boolean,
+        default: false
+    },
+    youtubeAccessToken: {
+        type: String
+    },
+    youtubeRefreshToken: {
+        type: String
+    },
+    youtubeTokenExpiry: {
+        type: Date
+    },
+    youtubeChannelId: {
+        type: String
+    },
+    youtubeChannelName: {
+        type: String
+    },
+    youtubeChannelHandle: {
+        type: String
+    },
+    youtubeChannelIcon: {
+        type: String
+    },
+    youtubeSubscriberCount: {
+        type: Number,
+        default: 0
+    },
+    youtubeLastSync: {
+        type: Date
     }
 }, { timestamps: true })
 

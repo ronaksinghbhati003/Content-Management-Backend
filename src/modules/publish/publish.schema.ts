@@ -100,7 +100,11 @@ const publishJobSchema = new Schema<IPublishJob>(
             default: null,
         },
     },
-    { timestamps: true }
+    { 
+        timestamps: true,
+        toJSON: { virtuals: true },
+        toObject: { virtuals: true }
+    }
 );
 
 publishJobSchema.index({ status: 1, scheduledAt: 1 });

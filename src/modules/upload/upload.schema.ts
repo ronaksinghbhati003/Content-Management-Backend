@@ -53,7 +53,11 @@ const uploadSchema = new Schema<IUpload>(
             default: 'ready',
         },
     },
-    { timestamps: true }
+    { 
+        timestamps: true,
+        toJSON: { virtuals: true },
+        toObject: { virtuals: true }
+    }
 );
 
 uploadSchema.index({ userId: 1, createdAt: -1 });

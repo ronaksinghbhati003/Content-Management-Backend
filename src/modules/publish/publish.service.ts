@@ -112,7 +112,7 @@ export class PublishService {
                     description: job.description,
                     tags: job.tags,
                     thumbnailUrl: job.thumbnailUrl,
-                });
+                }, job.userId.toString());
 
                 if (result.success) {
                     pr.status = 'published';

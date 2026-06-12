@@ -62,6 +62,13 @@ const publishController = new PublishController(publishService);
  */
 router.post('/create', publishController.create);
 
+// ── YouTube OAuth2 Integration Routes ─────────────────────────────────────────
+router.get('/youtube/connect', publishController.connectYouTube);
+router.get('/youtube/callback', publishController.youtubeCallback);
+router.get('/youtube/status', publishController.youtubeStatus);
+router.post('/youtube/disconnect', publishController.disconnectYouTube);
+
+
 /**
  * @swagger
  * /publish/list:
