@@ -6,6 +6,7 @@ export interface IPlatformResult {
     liveUrl?: string;
     error?: string;
     publishedAt?: Date;
+    progress?: number;
 }
 
 export interface IPublishJob extends Document {
@@ -36,6 +37,7 @@ const platformResultSchema = new Schema<IPlatformResult>(
         liveUrl: { type: String, default: null },
         error: { type: String, default: null },
         publishedAt: { type: Date, default: null },
+        progress: { type: Number, default: 0 },
     },
     { _id: false }
 );

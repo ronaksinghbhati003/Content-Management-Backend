@@ -105,6 +105,7 @@ export class PublishService {
 
             try {
                 pr.status = 'publishing';
+                pr.progress = 0;
                 await job.save();
 
                 const result = await adapter.publish(videoPath, {
@@ -112,7 +113,10 @@ export class PublishService {
                     description: job.description,
                     tags: job.tags,
                     thumbnailUrl: job.thumbnailUrl,
-                }, job.userId.toString());
+                }, job.userId.toString(), async (progressPercentage: number) => {
+                    pr.progress = progressPercentage;
+                    await job.save();
+                });
 
                 if (result.success) {
                     pr.status = 'published';

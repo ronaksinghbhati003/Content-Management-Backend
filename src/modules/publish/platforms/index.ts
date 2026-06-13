@@ -17,7 +17,7 @@ export interface PlatformAdapter {
         description: string;
         tags: string[];
         thumbnailUrl?: string;
-    }, userId?: string): Promise<PlatformPublishResult>;
+    }, userId?: string, onProgress?: (progress: number) => void): Promise<PlatformPublishResult>;
 }
 
 /**
