@@ -1,0 +1,51 @@
+import dotenv from 'dotenv';
+import path from 'path';
+
+// Load .env from project root
+dotenv.config({ path: path.resolve(__dirname, '../../.env') });
+
+interface Config {
+  port: number;
+  nodeEnv: string;
+  logLevel: string;
+  isProduction: boolean;
+  isDevelopment: boolean;
+  mongoUri: string;
+  jwtSecret: string;
+  jwtExpiresIn: string;
+  hashSaltRound: number;
+  geminiApiKey: string;
+  youtubeClientId: string;
+  youtubeClientSecret: string;
+  youtubeRedirectUri: string;
+  serverBaseUrl: string;
+  metaAppId: string;
+  metaAppSecret: string;
+  metaRedirectUri: string;
+  instagramAppId: string;
+  instagramAppSecret: string;
+}
+
+const config: Config = {
+  port: parseInt(process.env.PORT || '3000', 10),
+  nodeEnv: process.env.NODE_ENV || 'development',
+  logLevel: process.env.LOG_LEVEL || 'info',
+  isProduction: process.env.NODE_ENV === 'production',
+  isDevelopment: process.env.NODE_ENV === 'development',
+  mongoUri: process.env.MONGO_URI || '',
+  jwtSecret: process.env.JWT_SECRET || '',
+  jwtExpiresIn: process.env.JWT_EXPIRES_IN || '1h',
+  hashSaltRound: Number(process.env.HASH_SALT_ROUND) || 10,
+  geminiApiKey: process.env.GEMINI_API_KEY || '',
+  youtubeClientId: process.env.YOUTUBE_CLIENT_ID || '',
+  youtubeClientSecret: process.env.YOUTUBE_CLIENT_SECRET || '',
+  youtubeRedirectUri: process.env.YOUTUBE_REDIRECT_URI || 'http://localhost:3040/api/v1/publish/youtube/callback',
+  serverBaseUrl: process.env.SERVER_BASE_URL || 'http://localhost:3040',
+  metaAppId: process.env.META_APP_ID || '',
+  metaAppSecret: process.env.META_APP_SECRET || '',
+  metaRedirectUri: process.env.META_REDIRECT_URI || 'http://localhost:3040/api/v1/publish/instagram/callback',
+  instagramAppId: process.env.INSTAGRAM_APP_ID || '',
+  instagramAppSecret: process.env.INSTAGRAM_APP_SECRET || '',
+};
+
+export default config;
