@@ -1,0 +1,37 @@
+# Dependencies
+node_modules/
+
+# Build output
+dist/
+
+# Environment
+.env
+
+# Logs
+logs/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+#Postman
+postman_collection.json
+
+# Local Uploads
+uploads/
+
+# Per-user yt-dlp cookies (session data — never commit)
+cookies/
+
+# Personal planning/notes docs — not project source
+CreatorKit_COS_Strategic_Blueprint*.docx
+CreatorKit_Workflow_Blueprint.md
+document.md
+implementation_plan.md
+
