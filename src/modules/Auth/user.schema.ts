@@ -146,7 +146,33 @@ const userSchema = new mongoose.Schema({
     },
     ytDlpCookiesUpdatedAt: {
         type: Date
-    }
+    },
+
+    // Notification preferences (Settings > Notifications tab)
+    notificationPreferences: {
+        weeklyReport: { type: Boolean, default: true },
+        subscriberMilestone: { type: Boolean, default: true },
+        schedulerReminders: { type: Boolean, default: true },
+        aiInsightAlerts: { type: Boolean, default: true },
+        episodeDueReminders: { type: Boolean, default: true },
+        roadmapDeadlineAlerts: { type: Boolean, default: true },
+        teamMentions: { type: Boolean, default: false },
+    },
+
+    // Global 3-color theme (Settings > Appearance tab). `id` is a preset key
+    // ("indigo", "custom", ...); `colors` always holds the resolved 3 hex
+    // values so the frontend never has to re-derive a custom palette.
+    // Each color has one job: text (typography), component (buttons/cards/
+    // interactive UI), page (app background/outlet) — never interchanged.
+    themePreference: {
+        id: { type: String, default: 'indigo' },
+        mode: { type: String, enum: ['light', 'dark'], default: 'light' },
+        colors: {
+            text: { type: String, default: '#312E81' },
+            component: { type: String, default: '#6366F1' },
+            page: { type: String, default: '#EEF2FF' },
+        },
+    },
 }, { timestamps: true })
 
 const User = mongoose.model("Users", userSchema);

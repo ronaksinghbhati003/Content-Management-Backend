@@ -196,13 +196,23 @@ export async function downloadAndCutYouTubeClip(
     onProgress?.(2); // signal download started
     logger.info(`[Clip] Downloading ${clipSec}s clip from ${sourceUrl} [${timestampStart}→${timestampEnd}]`);
 
-    // mweb/web_creator/android_vr avoid the SABR-forced streaming YouTube now
-    // applies to the plain web/tv/android clients on many videos — SABR
-    // responses have no direct stream URL, so yt-dlp just drops those formats
-    // and quietly falls back to the old 360p-only "18" format. These clients
-    // still benefit from a PO token (via the bgutil provider, see
-    // bgutil-ytdlp-pot-provider) but don't require one to expose up to 1080p.
-    const HQ_CLIENTS = 'mweb,web_creator,android_vr,web,tv,web_safari,android';
+    // android_vr's https formats now hard-403 on the actual googlevideo.com
+    // CDN request (confirmed live) because they require a GVS PO Token that
+    // nothing here supplies — the bgutil-ytdlp-pot-provider package is
+    // installed but its companion server was never started (nothing
+    // listening on 127.0.0.1:4416), so no token is ever available. Unlike
+    // tv_simply/web's PO-token-gated formats, yt-dlp doesn't pre-filter
+    // android_vr's as requiring one, so it still gets picked by the format
+    // selector and only fails at actual download time — silently killing the
+    // whole clip instead of falling back. Dropped from the client list for
+    // that reason. tv_simply is kept at the end as a guaranteed-available
+    // fallback: its own https formats do get correctly pre-filtered when no
+    // token is available, but it still exposes the legacy itag 18 (360p
+    // h264+aac combined) format, which needs no token at all — so there's
+    // always at least one working option instead of a hard failure. Running
+    // the bgutil server (see the package's docs) would supply real PO tokens
+    // and unlock the higher tiers on every client, cookies or not.
+    const HQ_CLIENTS = 'mweb,web_creator,web,tv,web_safari,android,tv_simply';
 
     if (cookiesFilePath) {
         // Higher-quality path: authenticated clients can unlock higher tiers /

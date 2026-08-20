@@ -56,4 +56,30 @@ export class UserController {
         const profile = await this.userService.updateProfile(userId, req.body);
         res.status(200).json(ApiResponse.ok(profile, "Profile updated successfully"));
     }
+
+    updateNotifications = async (req: any, res: Response): Promise<void> => {
+        const userId = req.users?._id;
+        const profile = await this.userService.updateNotificationPreferences(userId, req.body);
+        res.status(200).json(ApiResponse.ok(profile, "Notification preferences updated successfully"));
+    }
+
+    updatePassword = async (req: any, res: Response): Promise<void> => {
+        const userId = req.users?._id;
+        const { currentPassword, newPassword } = req.body;
+        await this.userService.updatePassword(userId, currentPassword, newPassword);
+        res.status(200).json(ApiResponse.ok(null, "Password updated successfully"));
+    }
+
+    deleteAccount = async (req: any, res: Response): Promise<void> => {
+        const userId = req.users?._id;
+        const { password } = req.body;
+        await this.userService.deleteAccount(userId, password);
+        res.status(200).json(ApiResponse.ok(null, "Account deleted successfully"));
+    }
+
+    updateTheme = async (req: any, res: Response): Promise<void> => {
+        const userId = req.users?._id;
+        const profile = await this.userService.updateThemePreference(userId, req.body);
+        res.status(200).json(ApiResponse.ok(profile, "Theme preference updated successfully"));
+    }
 }

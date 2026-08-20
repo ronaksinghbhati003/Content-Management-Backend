@@ -30,4 +30,35 @@ const updateProfileSchema = z.object({
     }).optional(),
 })
 
-export { registerSchema, loginSchema, updateProfileSchema }
+const updatePasswordSchema = z.object({
+    currentPassword: z.string().min(1, "Current password is required"),
+    newPassword: z.string().min(8, "New password must be at least 8 characters"),
+})
+
+const updateNotificationsSchema = z.object({
+    weeklyReport: z.boolean().optional(),
+    subscriberMilestone: z.boolean().optional(),
+    schedulerReminders: z.boolean().optional(),
+    aiInsightAlerts: z.boolean().optional(),
+    episodeDueReminders: z.boolean().optional(),
+    roadmapDeadlineAlerts: z.boolean().optional(),
+    teamMentions: z.boolean().optional(),
+})
+
+const deleteAccountSchema = z.object({
+    password: z.string().min(1, "Password is required to delete your account"),
+})
+
+const hexColor = z.string().regex(/^#[0-9A-Fa-f]{6}$/, "Must be a 6-digit hex color, e.g. #6366F1");
+
+const updateThemeSchema = z.object({
+    id: z.string().min(1).max(30).optional(),
+    mode: z.enum(['light', 'dark']).optional(),
+    colors: z.object({
+        text: hexColor,
+        component: hexColor,
+        page: hexColor,
+    }).optional(),
+})
+
+export { registerSchema, loginSchema, updateProfileSchema, updatePasswordSchema, updateNotificationsSchema, deleteAccountSchema, updateThemeSchema }

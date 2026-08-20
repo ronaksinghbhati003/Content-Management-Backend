@@ -694,36 +694,32 @@ Use proven title formulas: numbers, power words, curiosity gaps, and emotional t
             ? titlesRaw.slice(0, 5)
             : [{ title: intent.topic, reason: 'Based on your original prompt' }];
 
-        // Step 3: Generate metadata (description, tags, hashtags)
-        logger.info(`[AI Pipeline] Step 3/5: Generating metadata`);
-        const metaResult = await llm.invoke([
-            {
-                role: 'system',
-                content: `You are an SEO and social media metadata expert. Generate optimized metadata for the content.
+        // Steps 3-5: metadata, script outline, and thumbnail prompt are all independent
+        // of each other (they only depend on intent + the chosen title from step 2), so
+        // run them concurrently instead of awaiting each one in sequence — this cuts the
+        // pipeline from 5 sequential LLM round-trips down to effectively 3.
+        logger.info(`[AI Pipeline] Steps 3-5/5: Generating metadata, script outline, and thumbnail prompt in parallel`);
+        const [metaResult, scriptResult, thumbResult] = await Promise.all([
+            llm.invoke([
+                {
+                    role: 'system',
+                    content: `You are an SEO and social media metadata expert. Generate optimized metadata for the content.
 Return ONLY a valid JSON object:
 {
   "description": "A compelling, SEO-optimized description (200-300 words) with timestamps if video format",
   "tags": ["tag1", "tag2", ...],  // 8-15 relevant tags
   "hashtags": ["#hashtag1", "#hashtag2", ...]  // 5-8 trending hashtags
 }`,
-            },
-            {
-                role: 'user',
-                content: `Topic: ${intent.topic}\nPlatform: ${intent.platform}\nFormat: ${intent.format}\nChosen Title: ${titles[0]?.title}\nAudience: ${intent.audience}`,
-            },
-        ]);
-        const metadata = extractJSON(typeof metaResult.content === 'string' ? metaResult.content : '') || {
-            description: `A comprehensive guide about ${intent.topic}`,
-            tags: [intent.topic.toLowerCase()],
-            hashtags: [`#${intent.topic.replace(/\s+/g, '').toLowerCase()}`],
-        };
-
-        // Step 4: Generate script outline
-        logger.info(`[AI Pipeline] Step 4/5: Generating script outline`);
-        const scriptResult = await llm.invoke([
-            {
-                role: 'system',
-                content: `You are an expert content script writer. Create a structured script outline.
+                },
+                {
+                    role: 'user',
+                    content: `Topic: ${intent.topic}\nPlatform: ${intent.platform}\nFormat: ${intent.format}\nChosen Title: ${titles[0]?.title}\nAudience: ${intent.audience}`,
+                },
+            ]),
+            llm.invoke([
+                {
+                    role: 'system',
+                    content: `You are an expert content script writer. Create a structured script outline.
 Return ONLY a valid JSON object:
 {
   "hook": "An attention-grabbing opening (2-3 sentences that create curiosity)",
@@ -733,24 +729,16 @@ Return ONLY a valid JSON object:
   "cta": "A compelling call-to-action closing (2-3 sentences)"
 }
 Include 3-5 main points. Make the hook irresistible and the CTA actionable.`,
-            },
-            {
-                role: 'user',
-                content: `Topic: ${intent.topic}\nTitle: ${titles[0]?.title}\nPlatform: ${intent.platform}\nTone: ${intent.tone}\nAudience: ${intent.audience}`,
-            },
-        ]);
-        const script = extractJSON(typeof scriptResult.content === 'string' ? scriptResult.content : '') || {
-            hook: `Let's dive into ${intent.topic}...`,
-            mainPoints: [{ heading: 'Main Point', content: 'Key content here...' }],
-            cta: 'Like and subscribe for more!',
-        };
-
-        // Step 5: Generate thumbnail prompt
-        logger.info(`[AI Pipeline] Step 5/5: Generating thumbnail prompt`);
-        const thumbResult = await llm.invoke([
-            {
-                role: 'system',
-                content: `You are a YouTube thumbnail design expert. Generate a detailed text-to-image prompt for creating an eye-catching thumbnail.
+                },
+                {
+                    role: 'user',
+                    content: `Topic: ${intent.topic}\nTitle: ${titles[0]?.title}\nPlatform: ${intent.platform}\nTone: ${intent.tone}\nAudience: ${intent.audience}`,
+                },
+            ]),
+            llm.invoke([
+                {
+                    role: 'system',
+                    content: `You are a YouTube thumbnail design expert. Generate a detailed text-to-image prompt for creating an eye-catching thumbnail.
 Return ONLY a plain text string (NOT JSON). The prompt should describe:
 - Visual composition and layout
 - Color scheme (bold, contrasting colors)
@@ -758,12 +746,23 @@ Return ONLY a plain text string (NOT JSON). The prompt should describe:
 - Facial expressions or reactions if applicable
 - Style (clean, professional, attention-grabbing)
 Keep it under 150 words.`,
-            },
-            {
-                role: 'user',
-                content: `Title: ${titles[0]?.title}\nTopic: ${intent.topic}\nPlatform: ${intent.platform}`,
-            },
+                },
+                {
+                    role: 'user',
+                    content: `Title: ${titles[0]?.title}\nTopic: ${intent.topic}\nPlatform: ${intent.platform}`,
+                },
+            ]),
         ]);
+        const metadata = extractJSON(typeof metaResult.content === 'string' ? metaResult.content : '') || {
+            description: `A comprehensive guide about ${intent.topic}`,
+            tags: [intent.topic.toLowerCase()],
+            hashtags: [`#${intent.topic.replace(/\s+/g, '').toLowerCase()}`],
+        };
+        const script = extractJSON(typeof scriptResult.content === 'string' ? scriptResult.content : '') || {
+            hook: `Let's dive into ${intent.topic}...`,
+            mainPoints: [{ heading: 'Main Point', content: 'Key content here...' }],
+            cta: 'Like and subscribe for more!',
+        };
         const thumbnailPrompt = typeof thumbResult.content === 'string'
             ? thumbResult.content.replace(/```/g, '').trim()
             : `Eye-catching thumbnail for: ${titles[0]?.title}`;

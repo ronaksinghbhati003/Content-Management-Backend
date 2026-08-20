@@ -3,7 +3,7 @@ import { validate } from "../../middlewares/validate.middleware";
 import { UserController } from "./user.controller";
 import { UserService } from "./user.service";
 import { asyncHandler } from '../../shared/async-handler';
-import { loginSchema, registerSchema, updateProfileSchema } from "./user.z.schema"
+import { loginSchema, registerSchema, updateProfileSchema, updatePasswordSchema, updateNotificationsSchema, deleteAccountSchema, updateThemeSchema } from "./user.z.schema"
 import { bearerTokenMiddleware } from "../../middlewares/bearer-token.middleware";
 
 const userRouter = Router();
@@ -204,5 +204,73 @@ userRouter.get("/profile", accessTokenMiddleware, asyncHandler(userController.ge
  *         description: Username already taken
  */
 userRouter.put("/profile", accessTokenMiddleware, validate(updateProfileSchema), asyncHandler(userController.updateProfile))
+
+/**
+ * @swagger
+ * /user/notifications:
+ *   put:
+ *     summary: Update notification preferences
+ *     description: Updates the authenticated user's email and in-app notification toggle preferences.
+ *     tags:
+ *       - Auth
+ *     security:
+ *       - accessAuth: []
+ *     responses:
+ *       200:
+ *         description: Notification preferences updated successfully
+ */
+userRouter.put("/notifications", accessTokenMiddleware, validate(updateNotificationsSchema), asyncHandler(userController.updateNotifications))
+
+/**
+ * @swagger
+ * /user/password:
+ *   put:
+ *     summary: Change password
+ *     description: Updates the authenticated user's password after verifying their current password.
+ *     tags:
+ *       - Auth
+ *     security:
+ *       - accessAuth: []
+ *     responses:
+ *       200:
+ *         description: Password updated successfully
+ *       401:
+ *         description: Current password is incorrect
+ */
+userRouter.put("/password", accessTokenMiddleware, validate(updatePasswordSchema), asyncHandler(userController.updatePassword))
+
+/**
+ * @swagger
+ * /user/account:
+ *   delete:
+ *     summary: Delete account
+ *     description: Soft-deletes the authenticated user's account after verifying their password.
+ *     tags:
+ *       - Auth
+ *     security:
+ *       - accessAuth: []
+ *     responses:
+ *       200:
+ *         description: Account deleted successfully
+ *       401:
+ *         description: Password is incorrect
+ */
+userRouter.delete("/account", accessTokenMiddleware, validate(deleteAccountSchema), asyncHandler(userController.deleteAccount))
+
+/**
+ * @swagger
+ * /user/theme:
+ *   put:
+ *     summary: Update theme preference
+ *     description: Updates the authenticated user's global 3-color theme (preset id, light/dark mode, and resolved primary/secondary/accent hex colors).
+ *     tags:
+ *       - Auth
+ *     security:
+ *       - accessAuth: []
+ *     responses:
+ *       200:
+ *         description: Theme preference updated successfully
+ */
+userRouter.put("/theme", accessTokenMiddleware, validate(updateThemeSchema), asyncHandler(userController.updateTheme))
 
 export default userRouter;
